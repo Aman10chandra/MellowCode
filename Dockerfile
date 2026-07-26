@@ -1,25 +1,15 @@
-# Multi-stage Dockerfile for MellowCode (Backend + Frontend)
-FROM node:20-slim AS frontend-builder
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
-RUN npm install
-COPY frontend/ ./
-RUN npm run build
-
+# Dockerfile for MellowCode Backend (Railway)
 FROM python:3.11-slim
 WORKDIR /app
 
 # Install dependencies
-COPY pyproject.toml ./
+COPY pyproject.toml uv.lock ./
 RUN pip install --no-cache-dir uv && uv pip install --system -r pyproject.toml
 
 # Copy backend code
 COPY server.py ./
 COPY agent/ ./agent/
 
-# Copy built frontend output for serving if needed
-COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
-
 EXPOSE 8000
 
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port $PORT"]
