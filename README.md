@@ -130,6 +130,4 @@ For complete instructions on deploying MellowCode to **Railway**, **Vercel**, or
 
 ---
 
-## 📝 License
 
-MIT License. Built with ❤️ by [Aman Chandra](https://github.com/Aman10chandra).

@@ -18,7 +18,7 @@ COPY server.py ./
 COPY agent/ ./agent/
 
 # Copy built frontend output for serving if needed
-COPY --from=frontend-builder /app/frontend/.output ./frontend/.output
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 EXPOSE 8000
 
