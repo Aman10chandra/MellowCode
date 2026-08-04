@@ -1,14 +1,14 @@
 # Dockerfile for MellowCode Backend
 FROM python:3.11-slim
+
 WORKDIR /app
 
 # Install dependencies
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
-COPY server.py ./
-COPY agent/ ./agent/
+# Copy backend code and templates
+COPY . ./
 
 EXPOSE 8000
 

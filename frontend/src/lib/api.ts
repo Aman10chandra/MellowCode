@@ -103,7 +103,7 @@ function handleResponseError(status: number, text: string, apiBase: string): nev
     status === 404
   ) {
     throw new Error(
-      `Backend not reachable. In Railway → Frontend Service → Variables, set:\n  VITE_API_URL = https://your-backend.up.railway.app\nThen click Deploy.`
+      `Backend not reachable at '${apiBase || "empty URL"}'.\n\nFix for Vercel + Render:\n1. In Vercel Project Settings → Environment Variables, add VITE_API_URL = https://<your-render-app>.onrender.com\n2. Redeploy your frontend on Vercel.`
     );
   }
   throw new Error(`Server error ${status}: ${text}`);
@@ -138,8 +138,9 @@ export async function streamGenerate(
       signal,
     });
   } catch {
+    const target = apiBase || "relative URL";
     throw new Error(
-      `Could not connect to backend. Set VITE_API_URL in Railway Frontend Variables to your backend URL.`
+      `Could not connect to backend at '${target}'.\n\nFix for Vercel + Render:\n1. In Vercel Project Settings → Environment Variables, add VITE_API_URL = https://<your-render-app>.onrender.com\n2. Redeploy your frontend on Vercel.`
     );
   }
 

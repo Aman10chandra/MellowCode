@@ -44,23 +44,26 @@
 
 ```
 MellowCode/
-├── agent/                  # LangGraph Multi-Agent Pipeline
-│   ├── graph.py            # Graph definition (Planner → Architect → Coder)
-│   ├── prompts.py          # System & user prompts for agents
-│   ├── states.py           # Pydantic state models & validators
-│   └── tools.py            # File system tools (read/write/list)
-├── server.py               # FastAPI backend & SSE streaming API
-├── pyproject.toml          # Python dependencies (managed via uv)
-├── Dockerfile              # Multi-stage production container build
-├── Procfile                # Process file for Railway / Heroku deployment
-└── frontend/               # TanStack Start / React Application
-    ├── src/
-    │   ├── lib/api.ts      # API client for backend communication
-    │   ├── routes/
-    │   │   ├── index.tsx   # Minimalist landing page
-    │   │   └── workspace.tsx # Lovable-style workspace (Preview & Code tabs)
-    │   └── routeTree.gen.ts
-    └── vite.config.ts      # Vite configuration with API proxy
+├── backend/                # Python FastAPI Backend
+│   ├── agent/              # LangGraph Multi-Agent Pipeline
+│   │   ├── graph.py        # Graph definition (Planner → Architect → Coder)
+│   │   ├── prompts.py      # System & user prompts for agents
+│   │   ├── states.py       # Pydantic state models & validators
+│   │   └── tools.py        # File system tools (read/write/list)
+│   ├── server.py           # FastAPI server & SSE streaming API
+│   ├── main.py             # CLI entry point
+│   ├── requirements.txt    # Python dependencies
+│   ├── render.yaml         # Render deployment configuration
+│   └── Dockerfile          # Backend Docker image config
+├── frontend/               # React + Vite Frontend
+│   ├── src/
+│   │   ├── lib/api.ts      # API client & backend resolution
+│   │   ├── routes/         # React application routes
+│   │   └── components/     # UI components
+│   ├── vercel.json         # Vercel SPA routing rewrite rules
+│   └── vite.config.ts      # Vite configuration & dev proxy
+├── DEPLOYMENT.md           # Step-by-step Render + Vercel deployment guide
+└── README.md
 ```
 
 ---
@@ -77,19 +80,17 @@ MellowCode/
 ### 1. Backend Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/Aman10chandra/MellowCode.git
-cd MellowCode
+# Navigate to backend folder
+cd backend
 
 # Create environment file and add your Groq API Key
 echo "GROQ_API_KEY=your_groq_api_key_here" > .env
 
-# Install dependencies using uv (or pip)
-pip install uv
-uv sync
+# Install dependencies
+pip install -r requirements.txt
 
 # Start FastAPI server (runs on http://localhost:8000)
-uv run uvicorn server:app --reload --port 8000
+python -m uvicorn server:app --reload --port 8000
 ```
 
 ---
@@ -99,35 +100,18 @@ uv run uvicorn server:app --reload --port 8000
 In a new terminal window:
 
 ```bash
-cd MellowCode/frontend
+# Navigate to frontend folder
+cd frontend
 
-# Install dependencies
+# Install Node dependencies
 npm install
 
-# Start Vite dev server (runs on http://localhost:5177)
+# Start Vite development server (runs on http://localhost:5173)
 npm run dev
 ```
 
-Open **`http://localhost:5177`** in your browser and start building!
-
 ---
 
-## 🔌 API Reference
+## 🌐 Deploying to Production
 
-| Endpoint | Method | Description |
-|---|---|---|
-| `/api/health` | `GET` | Server health check |
-| `/api/generate` | `POST` | Streams agent execution steps via SSE |
-| `/api/files` | `GET` | Returns list of generated project files |
-| `/api/file?path={path}` | `GET` | Returns content of a specific generated file |
-| `/api/preview/{path}` | `GET` | Serves static generated files for live iframe preview |
-
----
-
-## 📄 Deployment
-
-For complete instructions on deploying MellowCode to **Railway**, **Vercel**, or **Docker**, check out the [DEPLOYMENT.md](DEPLOYMENT.md) guide.
-
----
-
-
+For full step-by-step instructions on deploying the **Backend to Render** and the **Frontend to Vercel**, see [DEPLOYMENT.md](file:///Users/aman/Desktop/MellowCode/DEPLOYMENT.md).

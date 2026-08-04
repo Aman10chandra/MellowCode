@@ -1,14 +1,27 @@
-# Python-generated files
+# Python-generated files & caches
 __pycache__/
 *.py[oc]
 build/
 dist/
 wheels/
 *.egg-info
+backend/__pycache__/
+backend/agent/__pycache__/
+backend/generated_project/
 
-# Virtual environments
+# Node / Frontend build output & modules
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.output/
+frontend/.tanstack/
+
+# Virtual environments & env files
 .venv
 .env
+backend/.venv
+backend/.env
+frontend/.env
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
