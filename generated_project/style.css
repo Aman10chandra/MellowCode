@@ -8,10 +8,16 @@
 
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f0f0;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f4f4f4;
 }
 
-/* Topbar Styles */
+header, main, footer {
+  display: block;
+}
+
+/* Header Styles */
 
 .topbar {
   background-color: #333;
@@ -24,114 +30,19 @@ body {
   margin: 0;
 }
 
-/* Login and Signup Form Styles */
+/* Main Styles */
 
-.login-form, .signup-form {
-  max-width: 400px;
-  margin: 2em auto;
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 2em;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
-.login-form h2, .signup-form h2 {
-  margin-top: 0;
-}
-
-.login-form form, .signup-form form {
-  margin-top: 1em;
-}
-
-.login-form label, .signup-form label {
-  display: block;
-  margin-bottom: 0.5em;
-}
-
-.login-form input, .signup-form input {
-  width: 100%;
-  height: 2em;
-  margin-bottom: 1em;
-  padding: 0.5em;
-  border: 1px solid #ccc;
-}
-
-.login-form input[type="submit"], .signup-form input[type="submit"] {
-  background-color: #4CAF50;
-  color: #fff;
-  padding: 0.5em 1em;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.login-form input[type="submit"]:hover, .signup-form input[type="submit"]:hover {
-  background-color: #3e8e41;
-}
-
-/* Calculator Styles */
-
-.calculator {
-  max-width: 400px;
-  margin: 2em auto;
-  padding: 2em;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.calculator input[type="text"] {
-  width: 100%;
-  height: 2em;
-  margin-bottom: 1em;
-  padding: 0.5em;
-  border: 1px solid #ccc;
-  font-size: 1.5em;
-}
-
-.button-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 0.5em;
-}
-
-.button {
-  padding: 0.5em 1em;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.numeric-button {
-  background-color: #fff;
-}
-
-.operator-button {
-  background-color: #4CAF50;
-  color: #fff;
-}
-
-.equal-button {
-  background-color: #4CAF50;
-  color: #fff;
-  grid-column: 1 / 5;
-}
-
-.button:hover {
-  background-color: #3e8e41;
-}
-
-/* Product List and Cart Styles */
 
 .product-list, .cart {
-  max-width: 800px;
-  margin: 2em auto;
-  padding: 2em;
   background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  padding: 1em;
+  margin-bottom: 1em;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -139,26 +50,73 @@ body {
   margin-top: 0;
 }
 
-.product-list ul, .cart ul {
+#product-list, #cart {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.product-list li, .cart li {
-  padding: 1em;
+#product-list li, #cart li {
+  padding: 0.5em;
   border-bottom: 1px solid #ccc;
 }
 
-.product-list li:last-child, .cart li:last-child {
+#product-list li:last-child, #cart li:last-child {
   border-bottom: none;
 }
 
-.product-list a, .cart a {
-  text-decoration: none;
-  color: #337ab7;
+.add-to-cart, .remove-from-cart {
+  background-color: #333;
+  color: #fff;
+  border: none;
+  padding: 0.5em 1em;
+  cursor: pointer;
 }
 
-.product-list a:hover, .cart a:hover {
-  color: #23527c;
+.add-to-cart:hover, .remove-from-cart:hover {
+  background-color: #444;
+}
+
+/* Footer Styles */
+
+footer {
+  background-color: #333;
+  color: #fff;
+  padding: 1em;
+  text-align: center;
+  clear: both;
+}
+
+/* Calculator Styles */
+
+calculator {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px;
+  background-color: #fff;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.keypad-button {
+  background-color: #fff;
+  border: none;
+  padding: 10px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.keypad-button:hover {
+  background-color: #f0f0f0;
+}
+
+.display-screen {
+  grid-column: 1 / 5;
+  background-color: #fff;
+  padding: 10px;
+  font-size: 24px;
+  text-align: right;
+  border: 1px solid #ccc;
 }
