@@ -12,7 +12,14 @@ from pydantic import BaseModel
 from agent.graph import agent
 from agent.tools import PROJECT_ROOT, init_project_root
 
-app = FastAPI(title="MellowCode API Server", version="1.0.0")
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_project_root()
+    yield
+
+app = FastAPI(title="MellowCode API Server", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,9 +33,9 @@ class GenerateRequest(BaseModel):
     user_prompt: str
     recursion_limit: int = 100
 
-@app.on_event("startup")
-def startup_event():
-    init_project_root()
+@app.get("/")
+def root_check():
+    return {"status": "ok", "app": "MellowCode API"}
 
 @app.get("/api/health")
 def health_check():
