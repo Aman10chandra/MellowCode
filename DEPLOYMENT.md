@@ -1,6 +1,6 @@
 # MellowCode Deployment Guide 🚀 (100% FREE Tier Options)
 
-This guide provides step-by-step instructions to deploy **MellowCode** for **FREE** without requiring paid Render Blueprints or paid plans.
+This guide provides step-by-step instructions to deploy **MellowCode** for **FREE** without errors.
 
 ---
 
@@ -15,9 +15,9 @@ This is the fastest combination with free SSL, fast CDN response, and zero subsc
 3. Connect your GitHub repository.
 4. Fill in the configuration:
    - **Name**: `mellowcode-backend`
-   - **Language**: `Python 3`
-   - **Build Command**: `pip install --no-cache-dir uv && uv pip install --system -r pyproject.toml`
-   - **Start Command**: `uvicorn server:app --host 0.0.0.0 --port $PORT`
+   - **Language / Environment**: `Python 3`
+   - **Build Command**: `pip install .`
+   - **Start Command**: `python -m uvicorn server:app --host 0.0.0.0 --port $PORT`
    - **Instance Type**: **Free**
 5. Under **Environment Variables**, click **Add Environment Variable**:
    - `GROQ_API_KEY` = `your_actual_groq_api_key`
@@ -49,8 +49,8 @@ Instead of using paid Blueprints, you can create two separate **Free Web Service
 1. Click **New +** → **Web Service** → Select Repo.
 2. Name: `mellowcode-backend`
 3. Runtime: `Python 3`
-4. Build Command: `pip install --no-cache-dir uv && uv pip install --system -r pyproject.toml`
-5. Start Command: `uvicorn server:app --host 0.0.0.0 --port $PORT`
+4. Build Command: `pip install .`
+5. Start Command: `python -m uvicorn server:app --host 0.0.0.0 --port $PORT`
 6. Instance Type: **Free**
 7. Env Variable: `GROQ_API_KEY` = `your_groq_key`
 8. Copy the backend URL (e.g. `https://mellowcode-backend.onrender.com`).
