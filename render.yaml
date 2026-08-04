@@ -1,0 +1,24 @@
+services:
+  # Python FastAPI Backend
+  - type: web
+    name: mellowcode-backend
+    env: python
+    buildCommand: pip install --no-cache-dir uv && uv pip install --system -r pyproject.toml
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+
+  # TanStack Start SSR Frontend
+  - type: web
+    name: mellowcode-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: mellowcode-backend
+          property: host

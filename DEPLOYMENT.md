@@ -1,89 +1,91 @@
 # MellowCode Deployment Guide 🚀
 
-This document outlines step-by-step instructions for deploying **MellowCode** to production environments.
-
-MellowCode consists of two components:
-1. **Python FastAPI Backend** (`server.py` & `agent/`) — Requires a Python 3.11 runtime.
-2. **TanStack Start React Frontend** (`frontend/`) — Can be deployed to Node.js/Vite hosting environments.
+This document outlines step-by-step instructions for deploying **MellowCode** (FastAPI backend + TanStack Start frontend) to **Render**, **Vercel**, and **Railway**.
 
 ---
 
-## Strategy 1: Split Deployment (Railway + Vercel) — Recommended
+## 🔍 Why Frontend Was Not Loading (Root Cause & Fix)
 
-This strategy gives you optimal performance and free SSL certificates.
+This application uses **TanStack Start**, a fullstack React Server-Side Rendering (SSR) framework. 
+- Running `vite build` alone only compiles raw SSR assets into `dist/` without generating a production web server.
+- The build script has been updated to `"build": "vite build && nitro build"` which produces the executable `.output` directory.
+- For **Vercel**, Nitro generates Vercel Serverless Functions (`.output`).
+- For **Render / Node.js**, `npm run start` runs `node .output/server/index.mjs`.
 
-### Step 1: Deploy Backend on Railway
+---
 
-1. Sign in to [Railway.app](https://railway.app) with your GitHub account.
-2. Click **New Project** → **Deploy from GitHub repo**.
-3. Select the `MellowCode` repository.
-4. Go to the **Variables** tab in Railway and add:
-   ```env
-   GROQ_API_KEY=your_actual_groq_api_key
-   ```
-5. Railway auto-detects the `Procfile` (`web: uvicorn server:app --host 0.0.0.0 --port $PORT`).
-6. Under **Settings** → **Networking**, click **Generate Domain**.
-7. Copy your generated backend URL (e.g. `https://mellowcode-api.up.railway.app`).
+## Option 1: 1-Click Deployment on Render (Blueprint - Recommended)
+
+Render supports **Blueprints** using `render.yaml`, which automatically sets up both Backend and Frontend web services.
+
+1. Push your repository to **GitHub**.
+2. Log in to [Render Dashboard](https://dashboard.render.com).
+3. Click **New +** → **Blueprint**.
+4. Connect your `MellowCode` repository.
+5. Render will automatically detect `render.yaml` and create two services:
+   - `mellowcode-backend` (Python FastAPI)
+   - `mellowcode-frontend` (Node SSR Frontend)
+6. Under `mellowcode-backend` environment variables, set:
+   - `GROQ_API_KEY`: Your actual Groq API key from [Groq Console](https://console.groq.com).
+7. Click **Apply**. Render will build and deploy both services!
+
+---
+
+## Option 2: Deploy Frontend on Vercel + Backend on Render / Railway
+
+### Step 1: Deploy Backend (Render or Railway)
+
+#### On Render:
+1. Click **New +** → **Web Service**.
+2. Connect your repo.
+3. Configure settings:
+   - **Environment**: `Python 3`
+   - **Build Command**: `pip install --no-cache-dir uv && uv pip install --system -r pyproject.toml`
+   - **Start Command**: `uvicorn server:app --host 0.0.0.0 --port $PORT`
+4. Add Environment Variable:
+   - `GROQ_API_KEY` = `your_groq_api_key`
+5. Click **Create Web Service**.
+6. Copy your backend URL (e.g. `https://mellowcode-backend.onrender.com`).
 
 ---
 
 ### Step 2: Deploy Frontend on Vercel
 
-1. Sign in to [Vercel.com](https://vercel.com) with your GitHub account.
-2. Click **Add New** → **Project** and import the `MellowCode` repo.
-3. Configure the project settings:
+1. Log in to [Vercel](https://vercel.com).
+2. Click **Add New Project** and import your repo.
+3. Configure Project Settings:
    - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
+   - **Framework Preset**: `Other` (or Nitro / Vite)
+   - **Build Command**: `npm run build` *(runs `vite build && nitro build`)*
    - **Output Directory**: `.output`
 4. Expand **Environment Variables** and add:
-   ```env
-   VITE_API_URL=https://mellowcode-api.up.railway.app
-   ```
-   *(Replace with your actual Railway backend URL from Step 1)*
+   - `VITE_API_URL` = `https://mellowcode-backend.onrender.com` *(Replace with your actual backend URL from Step 1)*
 5. Click **Deploy**.
 
 ---
 
-## Strategy 2: Single-Container Docker Deployment
+## 🔒 Environment Variables Reference
 
-You can deploy the entire application inside a single Docker container using the provided multi-stage `Dockerfile`.
+| Variable | Target Service | Purpose | Example |
+|---|---|---|---|
+| `GROQ_API_KEY` | Backend | Required for AI generation | `gsk_...` |
+| `VITE_API_URL` | Frontend | Connects frontend to backend | `https://mellowcode-backend.onrender.com` |
 
-### Supported Platforms:
-- **Railway** (New Service → GitHub Repo → Select Dockerfile)
-- **Render.com** (Web Service → Environment: Docker)
-- **Fly.io** (`fly launch`)
-- **AWS ECS / DigitalOcean App Platform**
+---
 
-### Docker Command for Manual Host Deployment:
+## 🛠️ Local Build & Testing Commands
+
+To test the production build locally before deploying:
 
 ```bash
-# Build Docker image
-docker build -t mellowcode:latest .
+# Frontend
+cd frontend
+npm install
+npm run build
+npm run start # Runs server on http://localhost:3000
 
-# Run container with Groq API key
-docker run -d -p 8000:8000 \
-  -e GROQ_API_KEY="your_groq_api_key_here" \
-  --name mellowcode \
-  mellowcode:latest
+# Backend
+pip install uv
+uv pip install --system -r pyproject.toml
+uvicorn server:app --host 0.0.0.0 --port 8000
 ```
-
-Access your app at `http://localhost:8000`.
-
----
-
-## 🔒 Environment Variables Summary
-
-| Variable Name | Required | Description | Where to Set |
-|---|---|---|---|
-| `GROQ_API_KEY` | **Yes** | Your API key from Groq Console | Backend (Railway / Docker) |
-| `VITE_API_URL` | **Yes** | Public backend server URL | Frontend (Vercel) |
-
----
-
-## 💾 Persistent Storage Note for Generated Projects
-
-By default, generated web projects are stored on the server disk inside `./generated_project`.
-
-If deploying to cloud platforms with ephemeral filesystems (like Railway or Render), add a **Persistent Volume**:
-- **Railway**: Click **+ New** → **Volume** → Mount to `/app/generated_project`.
-- This ensures generated web apps persist across server restarts and redeployments.
