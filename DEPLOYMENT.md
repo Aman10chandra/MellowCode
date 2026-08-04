@@ -16,7 +16,7 @@ This is the fastest combination with free SSL, fast CDN response, and zero subsc
 4. Fill in the configuration:
    - **Name**: `mellowcode-backend`
    - **Language / Environment**: `Python 3`
-   - **Build Command**: `pip install .`
+   - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `python -m uvicorn server:app --host 0.0.0.0 --port $PORT`
    - **Instance Type**: **Free**
 5. Under **Environment Variables**, click **Add Environment Variable**:
@@ -49,7 +49,7 @@ Instead of using paid Blueprints, you can create two separate **Free Web Service
 1. Click **New +** → **Web Service** → Select Repo.
 2. Name: `mellowcode-backend`
 3. Runtime: `Python 3`
-4. Build Command: `pip install .`
+4. Build Command: `pip install -r requirements.txt`
 5. Start Command: `python -m uvicorn server:app --host 0.0.0.0 --port $PORT`
 6. Instance Type: **Free**
 7. Env Variable: `GROQ_API_KEY` = `your_groq_key`

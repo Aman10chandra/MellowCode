@@ -3,7 +3,7 @@ services:
   - type: web
     name: mellowcode-backend
     env: python
-    buildCommand: pip install .
+    buildCommand: pip install -r requirements.txt
     startCommand: python -m uvicorn server:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: GROQ_API_KEY
