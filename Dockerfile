@@ -1,4 +1,4 @@
-# Dockerfile for MellowCode Backend (Railway)
+# Dockerfile for MellowCode Backend
 FROM python:3.11-slim
 WORKDIR /app
 
@@ -12,4 +12,4 @@ COPY agent/ ./agent/
 
 EXPOSE 8000
 
-CMD ["python", "server.py"]
+CMD ["sh", "-c", "uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000}"]
