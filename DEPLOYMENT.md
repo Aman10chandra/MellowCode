@@ -1,75 +1,45 @@
-# MellowCode Deployment Guide 🚀 (100% FREE Tier Options)
+# MellowCode Deployment Guide 🚀 (Railway + Vercel)
 
-This guide provides step-by-step instructions to deploy **MellowCode** for **FREE** without errors.
-
----
-
-## ⚡ Option 1: Vercel (Frontend) + Render (Backend) — Recommended (100% Free)
-
-This is the fastest combination with free SSL, fast CDN response, and zero subscription costs.
-
-### Step 1: Deploy Backend on Render (Free Tier)
-
-1. Log in to [Render Dashboard](https://dashboard.render.com).
-2. Click **New +** → **Web Service**.
-3. Connect your GitHub repository.
-4. Fill in the configuration:
-   - **Name**: `mellowcode-backend`
-   - **Language / Environment**: `Python 3`
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `python -m uvicorn server:app --host 0.0.0.0 --port $PORT`
-   - **Instance Type**: **Free**
-5. Under **Environment Variables**, click **Add Environment Variable**:
-   - `GROQ_API_KEY` = `your_actual_groq_api_key`
-6. Click **Create Web Service**.
-7. Once deployed, copy your backend public URL (e.g. `https://mellowcode-backend.onrender.com`).
+This document provides step-by-step instructions for deploying **MellowCode** with the backend on **Railway** and the frontend on **Vercel**.
 
 ---
 
-### Step 2: Deploy Frontend on Vercel (Free Tier)
+## 🚀 Step 1: Deploy Backend on Railway
 
-1. Log in to [Vercel](https://vercel.com).
-2. Click **Add New Project** and import your GitHub repo.
-3. Configure Project Settings:
+1. Sign in to [Railway.app](https://railway.app) with your GitHub account.
+2. Click **New Project** → **Deploy from GitHub repo**.
+3. Select your `MellowCode` repository.
+4. Click **Add Variables** (or open the **Variables** tab) and add:
+   ```env
+   GROQ_API_KEY=your_actual_groq_api_key
+   ```
+5. Railway will automatically detect the backend (`Procfile` or `Dockerfile`) and build the project.
+6. Under your service's **Settings** → **Networking** (or **Public Networking**), click **Generate Domain**.
+7. Copy your generated backend URL (e.g. `https://mellowcode-backend.up.railway.app`).
+
+---
+
+## ⚡ Step 2: Deploy Frontend on Vercel
+
+1. Sign in to [Vercel.com](https://vercel.com) with your GitHub account.
+2. Click **Add New Project** and import your `MellowCode` repo.
+3. Configure project settings:
    - **Root Directory**: `frontend`
    - **Framework Preset**: `Other` (or Nitro / Vite)
    - **Build Command**: `npm run build`
    - **Output Directory**: `.output`
 4. Expand **Environment Variables** and add:
-   - `VITE_API_URL` = `https://mellowcode-backend.onrender.com` *(Replace with your Render backend URL)*
+   ```env
+   VITE_API_URL=https://mellowcode-backend.up.railway.app
+   ```
+   *(Replace with your actual Railway backend URL from Step 1)*
 5. Click **Deploy**.
 
 ---
 
-## 🐢 Option 2: Render Only (Manual Web Services - 100% Free)
+## 🔒 Required Environment Variables
 
-Instead of using paid Blueprints, you can create two separate **Free Web Services** on Render manually:
-
-### Backend Service:
-1. Click **New +** → **Web Service** → Select Repo.
-2. Name: `mellowcode-backend`
-3. Runtime: `Python 3`
-4. Build Command: `pip install -r requirements.txt`
-5. Start Command: `python -m uvicorn server:app --host 0.0.0.0 --port $PORT`
-6. Instance Type: **Free**
-7. Env Variable: `GROQ_API_KEY` = `your_groq_key`
-8. Copy the backend URL (e.g. `https://mellowcode-backend.onrender.com`).
-
-### Frontend Service:
-1. Click **New +** → **Web Service** → Select Repo.
-2. Name: `mellowcode-frontend`
-3. Root Directory: `frontend`
-4. Runtime: `Node`
-5. Build Command: `npm install && npm run build`
-6. Start Command: `npm run start`
-7. Instance Type: **Free**
-8. Env Variable: `VITE_API_URL` = `https://mellowcode-backend.onrender.com`
-
----
-
-## 🔒 Environment Variables Summary
-
-| Variable Name | Service | Where to Get / Value |
+| Service | Environment Variable | Value / Description |
 |---|---|---|
-| `GROQ_API_KEY` | Backend (Render) | Your API Key from [Groq Console](https://console.groq.com) |
-| `VITE_API_URL` | Frontend (Vercel / Render) | Your live backend service URL |
+| **Railway (Backend)** | `GROQ_API_KEY` | API Key from [Groq Console](https://console.groq.com) |
+| **Vercel (Frontend)** | `VITE_API_URL` | Public Railway Backend URL |
