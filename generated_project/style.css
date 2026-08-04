@@ -8,103 +8,48 @@
 
 body {
   font-family: Arial, sans-serif;
-  line-height: 1.6;
-  color: #333;
-  background-color: #f4f4f4;
+  background-color: #f0f0f0;
 }
 
-header, main, footer {
-  display: block;
-}
+/* Calculator Container */
 
-/* Header Styles */
-
-.topbar {
-  background-color: #333;
-  color: #fff;
-  padding: 1em;
-  text-align: center;
-}
-
-.topbar h1 {
-  margin: 0;
-}
-
-/* Main Styles */
-
-main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2em;
-}
-
-.product-list, .cart {
-  background-color: #fff;
-  padding: 1em;
-  margin-bottom: 1em;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.product-list h2, .cart h2 {
-  margin-top: 0;
-}
-
-#product-list, #cart {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-#product-list li, #cart li {
-  padding: 0.5em;
-  border-bottom: 1px solid #ccc;
-}
-
-#product-list li:last-child, #cart li:last-child {
-  border-bottom: none;
-}
-
-.add-to-cart, .remove-from-cart {
-  background-color: #333;
-  color: #fff;
-  border: none;
-  padding: 0.5em 1em;
-  cursor: pointer;
-}
-
-.add-to-cart:hover, .remove-from-cart:hover {
-  background-color: #444;
-}
-
-/* Footer Styles */
-
-footer {
-  background-color: #333;
-  color: #fff;
-  padding: 1em;
-  text-align: center;
-  clear: both;
-}
-
-/* Calculator Styles */
-
-calculator {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 10px;
-  background-color: #fff;
+.calculator {
+  max-width: 300px;
+  margin: 50px auto;
   padding: 20px;
-  border: 1px solid #ccc;
+  background-color: #fff;
+  border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.keypad-button {
-  background-color: #fff;
-  border: none;
+/* Display Screen */
+
+.display-screen {
+  width: 100%;
+  height: 40px;
+  margin-bottom: 20px;
   padding: 10px;
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: right;
+}
+
+/* Keypad Buttons */
+
+.keypad-button {
+  width: 60px;
+  height: 60px;
+  margin: 5px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
   font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
 }
 
@@ -112,11 +57,20 @@ calculator {
   background-color: #f0f0f0;
 }
 
-.display-screen {
-  grid-column: 1 / 5;
-  background-color: #fff;
-  padding: 10px;
-  font-size: 24px;
-  text-align: right;
-  border: 1px solid #ccc;
+/* Grid Layout for Keypad */
+
+.calculator {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px;
+}
+
+.keypad-button {
+  grid-column: span 1;
+}
+
+/* Specific Button Styles */
+
+#button-0 {
+  grid-column: span 2;
 }

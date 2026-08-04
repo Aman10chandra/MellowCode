@@ -7,29 +7,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main>
-        <calculator>
-            <div class="display-screen" id="display-screen"></div>
-            <button class="keypad-button" id="clear">C</button>
-            <button class="keypad-button" id="backspace">DEL</button>
-            <button class="keypad-button" id="divide">/</button>
-            <button class="keypad-button" id="7">7</button>
-            <button class="keypad-button" id="8">8</button>
-            <button class="keypad-button" id="9">9</button>
-            <button class="keypad-button" id="multiply">*</button>
-            <button class="keypad-button" id="4">4</button>
-            <button class="keypad-button" id="5">5</button>
-            <button class="keypad-button" id="6">6</button>
-            <button class="keypad-button" id="subtract">-</button>
-            <button class="keypad-button" id="1">1</button>
-            <button class="keypad-button" id="2">2</button>
-            <button class="keypad-button" id="3">3</button>
-            <button class="keypad-button" id="add">+</button>
-            <button class="keypad-button" id="0">0</button>
-            <button class="keypad-button" id="decimal">.</button>
-            <button class="keypad-button" id="equals">=</button>
-        </calculator>
-    </main>
+    <div class="calculator">
+        <input type="text" id="display-screen" class="display-screen" disabled>
+        <button id="button-7" class="keypad-button">7</button>
+        <button id="button-8" class="keypad-button">8</button>
+        <button id="button-9" class="keypad-button">9</button>
+        <button id="button-divide" class="keypad-button">/</button>
+        <button id="button-4" class="keypad-button">4</button>
+        <button id="button-5" class="keypad-button">5</button>
+        <button id="button-6" class="keypad-button">6</button>
+        <button id="button-multiply" class="keypad-button">*</button>
+        <button id="button-1" class="keypad-button">1</button>
+        <button id="button-2" class="keypad-button">2</button>
+        <button id="button-3" class="keypad-button">3</button>
+        <button id="button-subtract" class="keypad-button">-</button>
+        <button id="button-0" class="keypad-button">0</button>
+        <button id="button-decimal" class="keypad-button">.</button>
+        <button id="button-equals" class="keypad-button">=</button>
+        <button id="button-add" class="keypad-button">+</button>
+        <button id="button-clear" class="keypad-button">Clear</button>
+        <button id="button-delete" class="keypad-button">Delete</button>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
