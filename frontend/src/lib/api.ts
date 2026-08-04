@@ -1,14 +1,30 @@
+declare global {
+  interface Window {
+    __MELLOW_ENV__?: { VITE_API_URL?: string };
+  }
+}
+
 export function getApiBase(): string {
+  // 1. Runtime injection via /env.js (Docker/Railway production)
+  if (typeof window !== "undefined" && window.__MELLOW_ENV__?.VITE_API_URL) {
+    return window.__MELLOW_ENV__.VITE_API_URL.trim().replace(/\/+$/, "");
+  }
+  // 2. Vite build-time env (works when VITE_API_URL is available at npm run build)
   const envUrl = import.meta.env.VITE_API_URL as string | undefined;
   if (envUrl && envUrl.trim() !== "") {
     return envUrl.trim().replace(/\/+$/, "");
   }
+  // 3. LocalStorage override (browser console shortcut)
   if (typeof window !== "undefined") {
     const stored = window.localStorage.getItem("MELLOW_API_URL");
     if (stored && stored.trim() !== "") {
       return stored.trim().replace(/\/+$/, "");
     }
-    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    // 4. Localhost fallback
+    if (
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1"
+    ) {
       return "http://localhost:8000";
     }
   }
@@ -27,11 +43,9 @@ export function setCustomApiBase(url: string): void {
 
 function handleResponseError(status: number, text: string): never {
   const currentBase = getApiBase();
-  const attemptedUrl = currentBase ? `${currentBase}/api/...` : "relative path /api/...";
-  
-  if (text.includes("<!DOCTYPE html>") || text.includes("<html") || status === 404) {
+  if (!currentBase || text.includes("<!DOCTYPE html>") || text.includes("<html") || status === 404) {
     throw new Error(
-      `Backend URL not connected (404 at ${attemptedUrl}). Ensure VITE_API_URL is set on Vercel to your RAILWAY BACKEND URL (e.g. https://your-backend.up.railway.app) and click REDEPLOY.`
+      `Backend not connected. Set VITE_API_URL in your Railway Frontend Service Variables to your backend URL (e.g. https://your-backend.up.railway.app) and Redeploy.`
     );
   }
   throw new Error(`Server error ${status}: ${text}`);
@@ -65,10 +79,9 @@ export async function streamGenerate(
       body: JSON.stringify({ user_prompt: prompt, recursion_limit: 100 }),
       signal,
     });
-  } catch (err) {
-    const currentBase = apiBase || "(none set)";
+  } catch {
     throw new Error(
-      `Could not connect to backend at '${currentBase}'. Check that your Railway backend is live and CORS is allowed.`
+      `Could not connect to backend at '${apiBase || "(none)"}'. Ensure VITE_API_URL is set in Railway Frontend Variables.`
     );
   }
 

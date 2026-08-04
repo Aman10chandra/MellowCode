@@ -99,6 +99,8 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {/* Runtime env injected by entrypoint.sh — loads VITE_API_URL without a rebuild */}
+        <script src="/env.js" />
         <HeadContent />
       </head>
       <body>
