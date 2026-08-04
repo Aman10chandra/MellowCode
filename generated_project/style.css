@@ -30,26 +30,26 @@ body {
   height: 40px;
   margin-bottom: 20px;
   padding: 10px;
-  background-color: #f0f0f0;
-  border: none;
-  border-radius: 10px;
   font-size: 24px;
   font-weight: bold;
   text-align: right;
+  border: none;
+  border-radius: 10px;
+  background-color: #f0f0f0;
 }
 
-/* Keypad Buttons */
+/* Keypad */
 
 .keypad-button {
   width: 60px;
   height: 60px;
   margin: 5px;
   padding: 10px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 10px;
   font-size: 18px;
   font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  background-color: #fff;
   cursor: pointer;
 }
 
@@ -57,20 +57,21 @@ body {
   background-color: #f0f0f0;
 }
 
-/* Grid Layout for Keypad */
+/* Operator Buttons */
 
-.calculator {
+.operator-button {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+.operator-button:hover {
+  background-color: #3e8e41;
+}
+
+/* Grid System */
+
+.keypad {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-gap: 10px;
-}
-
-.keypad-button {
-  grid-column: span 1;
-}
-
-/* Specific Button Styles */
-
-#button-0 {
-  grid-column: span 2;
 }

@@ -248,7 +248,7 @@ function Workspace() {
       }
       // Refresh preview
       const ts = Date.now();
-      setPreviewSrc(`/api/preview/index.html?t=${ts}`);
+      setPreviewSrc(`${previewUrl("index.html")}?t=${ts}`);
       setIframeKey((k) => k + 1);
       setViewMode("preview");
     } catch {
@@ -360,7 +360,7 @@ function Workspace() {
   }
 
   function refreshPreview() {
-    setPreviewSrc(`/api/preview/index.html?t=${Date.now()}`);
+    setPreviewSrc(`${previewUrl("index.html")}?t=${Date.now()}`);
     setIframeKey((k) => k + 1);
   }
 
