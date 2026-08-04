@@ -248,7 +248,7 @@ function Workspace() {
       }
       // Refresh preview
       const ts = Date.now();
-      setPreviewSrc(`${previewUrl("index.html")}?t=${ts}`);
+      setPreviewSrc(`${await previewUrl("index.html")}?t=${ts}`);
       setIframeKey((k) => k + 1);
       setViewMode("preview");
     } catch {
@@ -359,8 +359,8 @@ function Workspace() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  function refreshPreview() {
-    setPreviewSrc(`${previewUrl("index.html")}?t=${Date.now()}`);
+  async function refreshPreview() {
+    setPreviewSrc(`${await previewUrl("index.html")}?t=${Date.now()}`);
     setIframeKey((k) => k + 1);
   }
 

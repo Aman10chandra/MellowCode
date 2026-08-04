@@ -4,20 +4,31 @@ declare global {
   }
 }
 
-export function getApiBase(): string {
-  // 1. Runtime injection via /env.js (Docker/Railway production)
+// ── API base resolution ──────────────────────────────────────────────────────
+// Priority:
+//   1. window.__MELLOW_ENV__ (set by entrypoint.sh at container start)
+//   2. /client-config.json  (served by Nitro server from process.env at runtime)
+//   3. import.meta.env.VITE_API_URL (Vite build-time bake — only if set)
+//   4. localStorage override (browser console shortcut for debugging)
+//   5. localhost:8000 fallback for local dev
+
+let _cachedApiBase: string | undefined;
+let _apiBasePromise: Promise<string> | null = null;
+
+function getApiBaseSync(): string | undefined {
+  // 1. Runtime injection via entrypoint.sh
   if (typeof window !== "undefined" && window.__MELLOW_ENV__?.VITE_API_URL) {
     return window.__MELLOW_ENV__.VITE_API_URL.trim().replace(/\/+$/, "");
   }
-  // 2. Vite build-time env (works when VITE_API_URL is available at npm run build)
+  // 2. Vite build-time env
   const envUrl = import.meta.env.VITE_API_URL as string | undefined;
-  if (envUrl && envUrl.trim() !== "") {
+  if (envUrl?.trim()) {
     return envUrl.trim().replace(/\/+$/, "");
   }
-  // 3. LocalStorage override (browser console shortcut)
+  // 3. localStorage override
   if (typeof window !== "undefined") {
     const stored = window.localStorage.getItem("MELLOW_API_URL");
-    if (stored && stored.trim() !== "") {
+    if (stored?.trim()) {
       return stored.trim().replace(/\/+$/, "");
     }
     // 4. Localhost fallback
@@ -28,7 +39,48 @@ export function getApiBase(): string {
       return "http://localhost:8000";
     }
   }
-  return "";
+  return undefined;
+}
+
+/** Resolves the backend API base URL, fetching /client-config.json if needed. */
+export async function resolveApiBase(): Promise<string> {
+  if (_cachedApiBase !== undefined) return _cachedApiBase;
+
+  // Try all sync sources first (no network request needed)
+  const sync = getApiBaseSync();
+  if (sync !== undefined) {
+    _cachedApiBase = sync;
+    return _cachedApiBase;
+  }
+
+  // Deduplicate concurrent callers
+  if (_apiBasePromise) return _apiBasePromise;
+
+  _apiBasePromise = (async () => {
+    try {
+      // Fetch /client-config.json from OUR Nitro server — reads process.env.VITE_API_URL
+      const res = await fetch("/client-config.json");
+      if (res.ok) {
+        const data = (await res.json()) as { apiUrl?: string };
+        if (data.apiUrl?.trim()) {
+          _cachedApiBase = data.apiUrl.trim().replace(/\/+$/, "");
+          console.log("[api] resolved from /client-config.json:", _cachedApiBase);
+          return _cachedApiBase;
+        }
+      }
+    } catch (e) {
+      console.warn("[api] /client-config.json fetch failed:", e);
+    }
+    _cachedApiBase = "";
+    return _cachedApiBase;
+  })();
+
+  return _apiBasePromise;
+}
+
+/** Synchronous getter — only returns a value if it's already been resolved. */
+export function getApiBase(): string {
+  return _cachedApiBase ?? getApiBaseSync() ?? "";
 }
 
 export function setCustomApiBase(url: string): void {
@@ -38,14 +90,20 @@ export function setCustomApiBase(url: string): void {
     } else {
       window.localStorage.setItem("MELLOW_API_URL", url.trim().replace(/\/+$/, ""));
     }
+    _cachedApiBase = undefined;
+    _apiBasePromise = null;
   }
 }
 
-function handleResponseError(status: number, text: string): never {
-  const currentBase = getApiBase();
-  if (!currentBase || text.includes("<!DOCTYPE html>") || text.includes("<html") || status === 404) {
+function handleResponseError(status: number, text: string, apiBase: string): never {
+  if (
+    !apiBase ||
+    text.includes("<!DOCTYPE html>") ||
+    text.includes("<html") ||
+    status === 404
+  ) {
     throw new Error(
-      `Backend not connected. Set VITE_API_URL in your Railway Frontend Service Variables to your backend URL (e.g. https://your-backend.up.railway.app) and Redeploy.`
+      `Backend not reachable. In Railway → Frontend Service → Variables, set:\n  VITE_API_URL = https://your-backend.up.railway.app\nThen click Deploy.`
     );
   }
   throw new Error(`Server error ${status}: ${text}`);
@@ -70,7 +128,7 @@ export async function streamGenerate(
   onEvent: (event: AgentEvent) => void,
   signal?: AbortSignal
 ): Promise<void> {
-  const apiBase = getApiBase();
+  const apiBase = await resolveApiBase();
   let res: Response;
   try {
     res = await fetch(`${apiBase}/api/generate`, {
@@ -81,13 +139,13 @@ export async function streamGenerate(
     });
   } catch {
     throw new Error(
-      `Could not connect to backend at '${apiBase || "(none)"}'. Ensure VITE_API_URL is set in Railway Frontend Variables.`
+      `Could not connect to backend. Set VITE_API_URL in Railway Frontend Variables to your backend URL.`
     );
   }
 
   if (!res.ok) {
     const text = await res.text();
-    handleResponseError(res.status, text);
+    handleResponseError(res.status, text, apiBase);
   }
 
   if (!res.body) throw new Error("No response body from server");
@@ -118,35 +176,35 @@ export async function streamGenerate(
 }
 
 export async function getFiles(): Promise<GeneratedFile[]> {
-  const apiBase = getApiBase();
+  const apiBase = await resolveApiBase();
   const res = await fetch(`${apiBase}/api/files`);
   if (!res.ok) {
     const text = await res.text();
-    handleResponseError(res.status, text);
+    handleResponseError(res.status, text, apiBase);
   }
   const data = (await res.json()) as { files: GeneratedFile[] };
   return data.files;
 }
 
 export async function getFileContent(path: string): Promise<string> {
-  const apiBase = getApiBase();
+  const apiBase = await resolveApiBase();
   const res = await fetch(`${apiBase}/api/file?path=${encodeURIComponent(path)}`);
   if (!res.ok) {
     const text = await res.text();
-    handleResponseError(res.status, text);
+    handleResponseError(res.status, text, apiBase);
   }
   const data = (await res.json()) as { path: string; content: string };
   return data.content;
 }
 
-export function previewUrl(path = "index.html"): string {
-  const apiBase = getApiBase();
+export async function previewUrl(path = "index.html"): Promise<string> {
+  const apiBase = await resolveApiBase();
   return `${apiBase}/api/preview/${path}`;
 }
 
 export async function healthCheck(): Promise<boolean> {
   try {
-    const apiBase = getApiBase();
+    const apiBase = await resolveApiBase();
     const res = await fetch(`${apiBase}/api/health`);
     return res.ok;
   } catch {

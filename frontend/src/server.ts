@@ -46,6 +46,23 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    const url = new URL(request.url);
+
+    // ── Runtime config endpoint ──────────────────────────────────────────────
+    // Served at /client-config.json so the browser can discover the backend
+    // URL without any build-time injection. VITE_API_URL is read directly from
+    // the server's process environment (set in Railway Variables tab).
+    if (url.pathname === "/client-config.json") {
+      const apiUrl = process.env.VITE_API_URL ?? "";
+      console.log(`[client-config] VITE_API_URL=${apiUrl}`);
+      return new Response(JSON.stringify({ apiUrl }), {
+        headers: {
+          "content-type": "application/json",
+          "cache-control": "no-store",
+        },
+      });
+    }
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
@@ -59,3 +76,4 @@ export default {
     }
   },
 };
+
