@@ -1,21 +1,37 @@
-function getApiBase(): string {
+export function getApiBase(): string {
   const envUrl = import.meta.env.VITE_API_URL as string | undefined;
   if (envUrl && envUrl.trim() !== "") {
     return envUrl.trim().replace(/\/+$/, "");
   }
-  if (
-    typeof window !== "undefined" &&
-    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1")
-  ) {
-    return "http://localhost:8000";
+  if (typeof window !== "undefined") {
+    const stored = window.localStorage.getItem("MELLOW_API_URL");
+    if (stored && stored.trim() !== "") {
+      return stored.trim().replace(/\/+$/, "");
+    }
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      return "http://localhost:8000";
+    }
   }
   return "";
 }
 
+export function setCustomApiBase(url: string): void {
+  if (typeof window !== "undefined") {
+    if (url.trim() === "") {
+      window.localStorage.removeItem("MELLOW_API_URL");
+    } else {
+      window.localStorage.setItem("MELLOW_API_URL", url.trim().replace(/\/+$/, ""));
+    }
+  }
+}
+
 function handleResponseError(status: number, text: string): never {
+  const currentBase = getApiBase();
+  const attemptedUrl = currentBase ? `${currentBase}/api/...` : "relative path /api/...";
+  
   if (text.includes("<!DOCTYPE html>") || text.includes("<html") || status === 404) {
     throw new Error(
-      "Backend URL not connected (404). Please go to your Vercel Project Settings -> Environment Variables, add VITE_API_URL with your Railway backend URL (e.g. https://mellowcode-backend.up.railway.app), and click Redeploy."
+      `Backend URL not connected (404 at ${attemptedUrl}). Ensure VITE_API_URL is set on Vercel to your RAILWAY BACKEND URL (e.g. https://your-backend.up.railway.app) and click REDEPLOY.`
     );
   }
   throw new Error(`Server error ${status}: ${text}`);
@@ -49,9 +65,10 @@ export async function streamGenerate(
       body: JSON.stringify({ user_prompt: prompt, recursion_limit: 100 }),
       signal,
     });
-  } catch {
+  } catch (err) {
+    const currentBase = apiBase || "(none set)";
     throw new Error(
-      "Could not connect to backend. Please ensure VITE_API_URL is set to your live backend URL in your Vercel Environment Variables and redeploy."
+      `Could not connect to backend at '${currentBase}'. Check that your Railway backend is live and CORS is allowed.`
     );
   }
 
