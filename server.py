@@ -136,4 +136,9 @@ async def generate_project(req: GenerateRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
+    port_str = os.environ.get("PORT", "8000")
+    try:
+        port = int(port_str)
+    except ValueError:
+        port = 8000
+    uvicorn.run("server:app", host="0.0.0.0", port=port, reload=False)
