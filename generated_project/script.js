@@ -1,93 +1,87 @@
-// Get the display screen element
-const displayScreen = document.getElementById('display-screen');
-
-// Initialize variables to store the current number, previous number, and operation
+let displayScreen = document.getElementById('display-screen');
 let currentNumber = '';
 let previousNumber = '';
-let operation = '';
-
-// Function to add a number to the current number
-function addNumber(number) {
-  if (currentNumber.includes('.') && number === '.') return;
-  currentNumber += number;
-  updateDisplay();
-}
-
-// Function to perform an operation
-function performOperation(op) {
-  if (currentNumber === '') return;
-  if (previousNumber !== '') {
-    calculateResult();
-  }
-  operation = op;
-  previousNumber = currentNumber;
-  currentNumber = '';
-}
-
-// Function to calculate the result of the operation
-function calculateResult() {
-  let result;
-  switch (operation) {
-    case '+':
-      result = parseFloat(previousNumber) + parseFloat(currentNumber);
-      break;
-    case '-':
-      result = parseFloat(previousNumber) - parseFloat(currentNumber);
-      break;
-    case '*':
-      result = parseFloat(previousNumber) * parseFloat(currentNumber);
-      break;
-    case '/':
-      if (currentNumber === '0') {
-        result = 'Error: Division by zero';
-      } else {
-        result = parseFloat(previousNumber) / parseFloat(currentNumber);
-      }
-      break;
-    default:
-      result = '';
-  }
-  currentNumber = result.toString();
-  previousNumber = '';
-  operation = '';
-  updateDisplay();
-}
+let operator = '';
+let result = '';
 
 // Function to update the display screen
-function updateDisplay() {
-  displayScreen.value = currentNumber;
+function updateDisplayScreen(number) {
+    displayScreen.value = number;
+}
+
+// Function to handle number button clicks
+function handleNumberButtonClick(event) {
+    const number = event.target.value;
+    currentNumber += number;
+    updateDisplayScreen(currentNumber);
+}
+
+// Function to handle operator button clicks
+function handleOperatorButtonClick(event) {
+    const operatorValue = event.target.value;
+    if (operatorValue === '=') {
+        calculateResult();
+    } else if (operatorValue === 'C') {
+        clearCalculator();
+    } else if (operatorValue === 'DEL') {
+        deleteLastDigit();
+    } else {
+        operator = operatorValue;
+        previousNumber = currentNumber;
+        currentNumber = '';
+    }
+}
+
+// Function to calculate the result
+function calculateResult() {
+    if (previousNumber !== '' && currentNumber !== '') {
+        const num1 = parseFloat(previousNumber);
+        const num2 = parseFloat(currentNumber);
+        switch (operator) {
+            case '+':
+                result = num1 + num2;
+                break;
+            case '-':
+                result = num1 - num2;
+                break;
+            case '*':
+                result = num1 * num2;
+                break;
+            case '/':
+                if (num2 !== 0) {
+                    result = num1 / num2;
+                } else {
+                    result = 'Error: Division by zero';
+                }
+                break;
+            default:
+                result = '';
+        }
+        updateDisplayScreen(result.toString());
+        previousNumber = '';
+        currentNumber = '';
+    }
 }
 
 // Function to clear the calculator
 function clearCalculator() {
-  currentNumber = '';
-  previousNumber = '';
-  operation = '';
-  updateDisplay();
+    currentNumber = '';
+    previousNumber = '';
+    operator = '';
+    result = '';
+    updateDisplayScreen('');
 }
 
-// Function to delete a digit from the current number
-function deleteDigit() {
-  currentNumber = currentNumber.slice(0, -1);
-  updateDisplay();
+// Function to delete the last digit
+function deleteLastDigit() {
+    currentNumber = currentNumber.slice(0, -1);
+    updateDisplayScreen(currentNumber);
 }
 
-// Add event listeners to the keypad buttons
-document.querySelectorAll('.keypad-button').forEach(button => {
-  button.addEventListener('click', () => {
-    const buttonValue = button.textContent;
-    if (buttonValue >= '0' && buttonValue <= '9' || buttonValue === '.') {
-      addNumber(buttonValue);
-    } else if (buttonValue === '+' || buttonValue === '-' || buttonValue === '*' || buttonValue === '/') {
-      performOperation(buttonValue);
-    } else if (buttonValue === '=') {
-      if (currentNumber !== '') {
-        calculateResult();
-      }
-    } else if (buttonValue === 'C') {
-      clearCalculator();
-    } else if (buttonValue === 'DEL') {
-      deleteDigit();
-    }
-  });
-});
+// Add event listeners to the number buttons
+const numberButtons = document.querySelectorAll('.keypad-button:not(.operator-button)');
+numberButtons.forEach(button => button.addEventListener('click', handleNumberButtonClick));
+
+// Add event listeners to the operator buttons
+const operatorButtons = document.querySelectorAll('.operator-button');
+operatorButtons.forEach(button => button.addEventListener('click', handleOperatorButtonClick));

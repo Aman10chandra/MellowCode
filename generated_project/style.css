@@ -1,5 +1,6 @@
-/* Global Styles */
+/* style.css */
 
+/* Global Styles */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -11,8 +12,7 @@ body {
   background-color: #f0f0f0;
 }
 
-/* Calculator Container */
-
+/* Calculator Styles */
 .calculator {
   max-width: 300px;
   margin: 50px auto;
@@ -22,8 +22,6 @@ body {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
-/* Display Screen */
 
 .display-screen {
   width: 100%;
@@ -38,15 +36,15 @@ body {
   background-color: #f0f0f0;
 }
 
-/* Keypad */
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px;
+}
 
 .keypad-button {
-  width: 60px;
-  height: 60px;
-  margin: 5px;
   padding: 10px;
   font-size: 18px;
-  font-weight: bold;
   border: none;
   border-radius: 10px;
   background-color: #fff;
@@ -57,8 +55,6 @@ body {
   background-color: #f0f0f0;
 }
 
-/* Operator Buttons */
-
 .operator-button {
   background-color: #4CAF50;
   color: #fff;
@@ -66,12 +62,4 @@ body {
 
 .operator-button:hover {
   background-color: #3e8e41;
-}
-
-/* Grid System */
-
-.keypad {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 10px;
 }

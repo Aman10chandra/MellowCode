@@ -9,7 +9,16 @@ function getApiBase(): string {
   ) {
     return "http://localhost:8000";
   }
-  return "http://localhost:8000";
+  return "";
+}
+
+function handleResponseError(status: number, text: string): never {
+  if (text.includes("<!DOCTYPE html>") || text.includes("<html") || status === 404) {
+    throw new Error(
+      "Backend URL not connected (404). Please go to your Vercel Project Settings -> Environment Variables, add VITE_API_URL with your Railway backend URL (e.g. https://mellowcode-backend.up.railway.app), and click Redeploy."
+    );
+  }
+  throw new Error(`Server error ${status}: ${text}`);
 }
 
 export type AgentEvent =
@@ -32,16 +41,23 @@ export async function streamGenerate(
   signal?: AbortSignal
 ): Promise<void> {
   const apiBase = getApiBase();
-  const res = await fetch(`${apiBase}/api/generate`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ user_prompt: prompt, recursion_limit: 100 }),
-    signal,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${apiBase}/api/generate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_prompt: prompt, recursion_limit: 100 }),
+      signal,
+    });
+  } catch {
+    throw new Error(
+      "Could not connect to backend. Please ensure VITE_API_URL is set to your live backend URL in your Vercel Environment Variables and redeploy."
+    );
+  }
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Server error ${res.status}: ${text}`);
+    handleResponseError(res.status, text);
   }
 
   if (!res.body) throw new Error("No response body from server");
@@ -74,7 +90,10 @@ export async function streamGenerate(
 export async function getFiles(): Promise<GeneratedFile[]> {
   const apiBase = getApiBase();
   const res = await fetch(`${apiBase}/api/files`);
-  if (!res.ok) throw new Error("Failed to fetch file list");
+  if (!res.ok) {
+    const text = await res.text();
+    handleResponseError(res.status, text);
+  }
   const data = (await res.json()) as { files: GeneratedFile[] };
   return data.files;
 }
@@ -82,7 +101,10 @@ export async function getFiles(): Promise<GeneratedFile[]> {
 export async function getFileContent(path: string): Promise<string> {
   const apiBase = getApiBase();
   const res = await fetch(`${apiBase}/api/file?path=${encodeURIComponent(path)}`);
-  if (!res.ok) throw new Error(`Failed to fetch file: ${path}`);
+  if (!res.ok) {
+    const text = await res.text();
+    handleResponseError(res.status, text);
+  }
   const data = (await res.json()) as { path: string; content: string };
   return data.content;
 }
